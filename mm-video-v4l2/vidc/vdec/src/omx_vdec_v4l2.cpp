@@ -631,6 +631,7 @@ omx_vdec::omx_vdec(): m_error_propogated(false),
     current_perf_level(V4L2_CID_MPEG_VIDC_PERF_LEVEL_NOMINAL),
     secure_scaling_to_non_secure_opb(false),
     m_force_compressed_for_dpb(false),
+    m_force_linear_combined_for_cpu(false),
     m_is_display_session(false)
 {
     m_pipe_in = -1;
@@ -708,6 +709,11 @@ omx_vdec::omx_vdec(): m_error_propogated(false),
     property_get("vidc.dec.debug.dyn.disabled", property_value, "0");
     m_disable_dynamic_buf_mode = atoi(property_value);
     DEBUG_PRINT_HIGH("vidc.dec.debug.dyn.disabled value is %d",m_disable_dynamic_buf_mode);
+
+    property_value[0] = '\0';
+    property_get("vidc.dec.disable.split.cpu", property_value, "0");
+    m_force_linear_combined_for_cpu = atoi(property_value);
+    DEBUG_PRINT_HIGH("vidc.dec.disable.split.cpu value is %d",m_force_linear_combined_for_cpu);
 
 #ifdef _UBWC_
     property_value[0] = '\0';
@@ -957,7 +963,8 @@ OMX_ERRORTYPE omx_vdec::decide_dpb_buffer_mode(bool force_split_mode)
 
     if (cpu_access) {
         if (dpb_bit_depth == MSM_VIDC_BIT_DEPTH_8) {
-            if ((m_force_compressed_for_dpb || is_res_above_1080p) &&
+            if (!m_force_linear_combined_for_cpu &&
+                (m_force_compressed_for_dpb || is_res_above_1080p) &&
                 !force_split_mode) {
                 //split DPB-OPB
                 //DPB -> UBWC , OPB -> Linear
