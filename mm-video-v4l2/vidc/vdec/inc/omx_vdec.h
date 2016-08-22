@@ -1065,7 +1065,8 @@ private:
         volatile int32_t m_queued_codec_config_count;
         OMX_U32 current_perf_level;
         bool secure_scaling_to_non_secure_opb;
-	bool m_force_compressed_for_dpb;
+        bool m_force_compressed_for_dpb;
+        bool m_force_linear_combined_for_cpu;
         bool m_is_display_session;
         class perf_lock {
             private:
