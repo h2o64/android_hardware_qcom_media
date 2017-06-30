@@ -239,6 +239,13 @@ struct vdec_ion {
 };
 #endif
 
+struct vdec_ion_map_info {
+    bool free_buffer;
+    unsigned char *base_address;
+    int map_size;
+    int offset;
+};
+
 #ifdef _MSM8974_
 struct extradata_buffer_info {
     unsigned long buffer_size;
@@ -271,6 +278,7 @@ struct video_driver_context {
     struct vdec_ion meta_buffer;
     struct vdec_ion meta_buffer_iommu;
 #endif
+    struct vdec_ion_map_info *op_buf_map_info;
     struct vdec_framerate frame_rate;
     unsigned extradata;
     bool timestamp_adjust;
@@ -1065,7 +1073,8 @@ private:
         volatile int32_t m_queued_codec_config_count;
         OMX_U32 current_perf_level;
         bool secure_scaling_to_non_secure_opb;
-	bool m_force_compressed_for_dpb;
+        bool m_force_compressed_for_dpb;
+        bool m_force_linear_combined_for_cpu;
         bool m_is_display_session;
         class perf_lock {
             private:
